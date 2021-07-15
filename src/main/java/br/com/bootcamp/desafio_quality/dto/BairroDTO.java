@@ -4,6 +4,7 @@ import br.com.bootcamp.desafio_quality.entity.Bairro;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ public class BairroDTO {
     private String nome;
 
     @NotNull(message = "O valor do metro quadrado do bairro não pode ser vazio")
-    @Max(value = 13, message = "O comprimento máximo não pode excedor 13 digitos")
+    @DecimalMax(value = "9999999999999", message = "O comprimento máximo não pode excedor 13 digitos")
     @Positive
     private BigDecimal custoPorMetroQuadrado;
 

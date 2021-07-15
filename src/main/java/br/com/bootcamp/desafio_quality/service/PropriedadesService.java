@@ -1,11 +1,13 @@
 package br.com.bootcamp.desafio_quality.service;
 
-import br.com.bootcamp.desafio_quality.dto.ComodoRequestDTO;
 import br.com.bootcamp.desafio_quality.dto.ComodoResponseDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeInfoDTO;
 import br.com.bootcamp.desafio_quality.entity.Comodo;
 import br.com.bootcamp.desafio_quality.entity.Propriedade;
+import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
+import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,8 +18,20 @@ import java.util.stream.Collectors;
 @Service
 public class PropriedadesService implements IPropriedadesService {
 
+    private final IBairroRepository bairroRepository;
+
+    @Autowired
+    public PropriedadesService(IBairroRepository bairroRepository) {
+        this.bairroRepository = bairroRepository;
+    }
+
     @Override
     public PropriedadeInfoDTO calcularInfos(PropriedadeDTO propriedadeDTO) {
+
+        if(!bairroRepository.existe(propriedadeDTO.getBairro().getNome())){
+            throw new BairroInexistenteException("Esse bairro não existe!");
+        }
+
         Propriedade propriedade = propriedadeDTO.toEntity();
         List<Comodo> comodos = propriedade.getComodos();
 
