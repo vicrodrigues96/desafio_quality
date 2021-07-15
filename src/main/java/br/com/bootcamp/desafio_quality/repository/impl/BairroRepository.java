@@ -1,8 +1,9 @@
-package br.com.bootcamp.desafio_quality.repository;
+package br.com.bootcamp.desafio_quality.repository.impl;
 
 import br.com.bootcamp.desafio_quality.entity.Bairro;
 import br.com.bootcamp.desafio_quality.exception.ConflictException;
 import br.com.bootcamp.desafio_quality.exception.PersistenceException;
+import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

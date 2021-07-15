@@ -10,8 +10,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Propriedade {
-
+    private Integer id;
     private String nome;
     private Bairro bairro;
     private List<Comodo> comodos;
+
+    public Propriedade(String nome, Bairro bairro, List<Comodo> comodos) {
+        this.nome = nome;
+        this.bairro = bairro;
+        this.comodos = comodos;
+    }
 }

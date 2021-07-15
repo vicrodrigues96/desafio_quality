@@ -1,13 +1,14 @@
-package br.com.bootcamp.desafio_quality.service;
+package br.com.bootcamp.desafio_quality.service.impl;
 
 import br.com.bootcamp.desafio_quality.dto.BairroDTO;
 import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
+import br.com.bootcamp.desafio_quality.service.IBairrosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BairrosService implements IBairrosService{
+public class BairrosService implements IBairrosService {
 
 
     private final IBairroRepository bairroRepository;

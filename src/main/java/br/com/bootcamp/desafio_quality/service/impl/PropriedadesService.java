@@ -1,4 +1,4 @@
-package br.com.bootcamp.desafio_quality.service;
+package br.com.bootcamp.desafio_quality.service.impl;
 
 import br.com.bootcamp.desafio_quality.dto.ComodoResponseDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeDTO;
@@ -7,6 +7,7 @@ import br.com.bootcamp.desafio_quality.entity.Comodo;
 import br.com.bootcamp.desafio_quality.entity.Propriedade;
 import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
+import br.com.bootcamp.desafio_quality.service.IPropriedadesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
