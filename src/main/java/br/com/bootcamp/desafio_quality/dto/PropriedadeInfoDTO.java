@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PropriedadeInfoDTO {
 
-    private BigDecimal areaTotal;
+    private double areaTotal;
     private BigDecimal valorTotal;
     private ComodoResponseDTO maiorComodo;
     private List<ComodoResponseDTO> comodos;
