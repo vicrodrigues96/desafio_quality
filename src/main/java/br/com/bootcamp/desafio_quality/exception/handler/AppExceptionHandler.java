@@ -2,6 +2,8 @@ package br.com.bootcamp.desafio_quality.exception.handler;
 
 import br.com.bootcamp.desafio_quality.dto.MensagemDeErroDTO;
 import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
+import br.com.bootcamp.desafio_quality.exception.ConflictException;
+import br.com.bootcamp.desafio_quality.exception.PersistenceException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 public class AppExceptionHandler {
 
     @ExceptionHandler({BairroInexistenteException.class})
-    public ResponseEntity<?> defaultHandler(RuntimeException e){
+    public ResponseEntity<?> defaultHandler(){
         return ResponseEntity.badRequest().build();
     }
 
@@ -34,6 +36,16 @@ public class AppExceptionHandler {
         String stringErrors = String.join(", ", fieldErrorsString);
 
         return ResponseEntity.badRequest().body(new MensagemDeErroDTO(HttpStatus.BAD_REQUEST.value(), stringErrors));
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    public ResponseEntity<MensagemDeErroDTO> persistenceErrorHandler(PersistenceException e) {
+        return ResponseEntity.internalServerError().body(new MensagemDeErroDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<MensagemDeErroDTO> conflictErrorHandler(ConflictException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new MensagemDeErroDTO(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
 }
