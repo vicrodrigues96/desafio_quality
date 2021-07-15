@@ -28,9 +28,9 @@ public class PropriedadesService implements IPropriedadesService {
     @Override
     public PropriedadeInfoDTO calcularInfos(PropriedadeDTO propriedadeDTO) {
 
-        if(!bairroRepository.existe(propriedadeDTO.getBairro().getNome())){
-            throw new BairroInexistenteException("Esse bairro não existe!");
-        }
+//        if(!bairroRepository.existe(propriedadeDTO.getBairro().getNome())){
+//            throw new BairroInexistenteException("Esse bairro não existe!");
+        //}
 
         Propriedade propriedade = propriedadeDTO.toEntity();
         List<Comodo> comodos = propriedade.getComodos();
