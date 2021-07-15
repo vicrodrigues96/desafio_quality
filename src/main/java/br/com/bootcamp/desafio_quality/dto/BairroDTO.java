@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Data
@@ -19,6 +17,7 @@ public class BairroDTO {
     private String nome;
 
     @NotNull(message = "O valor do metro quadrado do bairro não pode ser vazio")
-    @Size(max = 13, message = "O comprimento máximo não pode excedor 13 digitos")
+    @Max(value = 13, message = "O comprimento máximo não pode excedor 13 digitos")
+    @Positive
     private BigDecimal custoPorMetroQuadrado;
 }
