@@ -1,5 +1,6 @@
 package br.com.bootcamp.desafio_quality.dto;
 
+import br.com.bootcamp.desafio_quality.entity.Comodo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,8 @@ public class ComodoRequestDTO {
     @Positive
     @Max(value = 25, message = "A largura do cômodo não pode exceder 25 metros.")
     private Double largura;
+
+    public Comodo toEntity() {
+        return new Comodo(this.nome, this.comprimento, this.largura);
+    }
 }

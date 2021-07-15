@@ -2,11 +2,12 @@ package br.com.bootcamp.desafio_quality.controller;
 
 import br.com.bootcamp.desafio_quality.dto.PropriedadeDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeInfoDTO;
+import br.com.bootcamp.desafio_quality.service.IPropriedadesService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -14,9 +15,15 @@ import javax.validation.Valid;
 @RequestMapping("/propriedades")
 public class PropriedadesController {
 
+    private final IPropriedadesService propriedadesService;
+
+    @Autowired
+    public PropriedadesController(IPropriedadesService propriedadesService) {
+        this.propriedadesService = propriedadesService;
+    }
 
     @PostMapping("/info")
-    public ResponseEntity<PropriedadeInfoDTO> calcularInfos(@RequestBody @Valid PropriedadeDTO propriedade) {
-        throw new RuntimeException("not implemented");
+    public PropriedadeInfoDTO calcularInfos(@RequestBody @Valid PropriedadeDTO propriedade) {
+       return propriedadesService.calcularInfos(propriedade);
     }
 }

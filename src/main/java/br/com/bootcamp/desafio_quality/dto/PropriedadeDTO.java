@@ -1,6 +1,8 @@
 package br.com.bootcamp.desafio_quality.dto;
 
 import br.com.bootcamp.desafio_quality.entity.Bairro;
+import br.com.bootcamp.desafio_quality.entity.Comodo;
+import br.com.bootcamp.desafio_quality.entity.Propriedade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -29,4 +32,11 @@ public class PropriedadeDTO {
     @NotNull(message = "A lista de comodos não pode ser nula")
     @Valid
     private List<ComodoRequestDTO> comodos;
+
+    public Propriedade toEntity() {
+        List<Comodo> comodoEntities =  comodos.stream() //TODO avaliar extração para método
+                .map(ComodoRequestDTO::toEntity)
+                .collect(Collectors.toList());
+        return new Propriedade(nome, bairro.toEntity(), comodoEntities);
+    }
 }

@@ -1,5 +1,6 @@
 package br.com.bootcamp.desafio_quality.dto;
 
+import br.com.bootcamp.desafio_quality.entity.Bairro;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,8 @@ public class BairroDTO {
     @Max(value = 13, message = "O comprimento máximo não pode excedor 13 digitos")
     @Positive
     private BigDecimal custoPorMetroQuadrado;
+
+    public Bairro toEntity() {
+        return new Bairro(nome, custoPorMetroQuadrado);
+    }
 }
