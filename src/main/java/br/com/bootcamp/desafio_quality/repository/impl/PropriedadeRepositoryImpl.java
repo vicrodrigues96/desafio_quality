@@ -25,7 +25,7 @@ public class PropriedadeRepositoryImpl implements IPropriedadeRepository {
     @Autowired
     public PropriedadeRepositoryImpl(ObjectMapper mapper, Environment env) {
         this.mapper = mapper;
-        var filePath = env.getProperty("repository.propriedade.path", "src/main/resources/repository/propriedades.json");
+        var filePath = env.getProperty("repository.propriedades.path", "src/main/resources/repository/propriedades.json");
         this.FILE = new File(filePath);
     }
 
@@ -46,7 +46,7 @@ public class PropriedadeRepositoryImpl implements IPropriedadeRepository {
 
     @Override
     public Optional<Propriedade> buscarPropriedade(Integer id) {
-        return Optional.of(getPropriedades().get(id));
+        return Optional.ofNullable(getPropriedades().get(id));
     }
 
     private HashMap<Integer, Propriedade> getPropriedades() {
