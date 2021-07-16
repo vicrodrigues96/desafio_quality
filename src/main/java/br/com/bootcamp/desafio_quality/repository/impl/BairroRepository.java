@@ -7,6 +7,8 @@ import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -18,12 +20,14 @@ import java.util.Optional;
 @Repository
 public class BairroRepository implements IBairroRepository {
 
-    private static final File FILE = new File("src/main/resources/repository/bairros.json");
+    private final File FILE;
     private final ObjectMapper mapper;
 
     @Autowired
-    public BairroRepository(ObjectMapper mapper) {
+    public BairroRepository(ObjectMapper mapper, Environment env) {
         this.mapper = mapper;
+        var filePath = env.getProperty("repository.bairros.path", "src/main/resources/repository/bairros.json");
+        this.FILE = new File(filePath);
     }
 
     @Override

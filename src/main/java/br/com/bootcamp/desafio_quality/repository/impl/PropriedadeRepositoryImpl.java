@@ -7,6 +7,7 @@ import br.com.bootcamp.desafio_quality.repository.IPropriedadeRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -16,14 +17,16 @@ import java.util.*;
 @Repository
 public class PropriedadeRepositoryImpl implements IPropriedadeRepository {
 
-    private static final File FILE = new File("src/main/resources/repository/propriedades.json");
+    private final File FILE;
     private final ObjectMapper mapper;
-    
+
     private final static Random random = new Random();
 
     @Autowired
-    public PropriedadeRepositoryImpl(ObjectMapper mapper) {
+    public PropriedadeRepositoryImpl(ObjectMapper mapper, Environment env) {
         this.mapper = mapper;
+        var filePath = env.getProperty("repository.propriedade.path", "src/main/resources/repository/propriedades.json");
+        this.FILE = new File(filePath);
     }
 
     @Override
