@@ -2,9 +2,9 @@ package br.com.bootcamp.desafio_quality.services.Impl;
 import br.com.bootcamp.desafio_quality.dto.ComodoRequestDTO;
 import br.com.bootcamp.desafio_quality.dto.ComodoResponseDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeDTO;
-import br.com.bootcamp.desafio_quality.dto.ValorPropriedadeDTO;
 import br.com.bootcamp.desafio_quality.entity.Bairro;
 import br.com.bootcamp.desafio_quality.exception.ConflictException;
+import br.com.bootcamp.desafio_quality.exception.PropriedadeInexistenteException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
 import br.com.bootcamp.desafio_quality.repository.IPropriedadeRepository;
 import br.com.bootcamp.desafio_quality.service.impl.PropriedadesService;
@@ -172,5 +172,65 @@ public class PropriedadesServiceTest {
         List<ComodoResponseDTO> comodoResponseDTOS = Arrays.asList(new ComodoResponseDTO("quarto", 100.0));
 
         assertEquals(comodoResponseDTOS, propriedadesService.calcularAreaComodos(id));
+    }
+
+    @Test
+    void buscarMaiorComodo_unicoComodo_resultadoQuarto() {
+        List<ComodoRequestDTO> comodos = Arrays.asList(new ComodoRequestDTO("quarto", 10.0, 10.0));
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        int id = 1;
+
+        when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
+
+        ComodoResponseDTO comodoResponseDTOS = new ComodoResponseDTO("quarto", 100.0);
+
+        assertEquals(comodoResponseDTOS.getNome(), propriedadesService.buscarMaiorComodo(id).getNome());
+    }
+
+    @Test
+    void buscarMaiorComodo_empate_retornaOrdemInsercao() {
+        List<ComodoRequestDTO> comodos = Arrays.asList(new ComodoRequestDTO("quarto", 10.0, 10.0),
+                                                       new ComodoRequestDTO("sala", 10.0, 10.0));
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        int id = 1;
+
+        when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
+
+        ComodoResponseDTO comodoResponseDTOS = new ComodoResponseDTO("quarto", 100.0);
+
+        assertEquals(comodoResponseDTOS.getNome(), propriedadesService.buscarMaiorComodo(id).getNome());
+    }
+
+    @Test
+    void buscarMaiorComodo_diferentes_resultadoCozinha() {
+        List<ComodoRequestDTO> comodos = Arrays.asList(new ComodoRequestDTO("quarto", 10.0, 10.0),
+                                                       new ComodoRequestDTO("sala", 10.0, 10.0),
+                                                       new ComodoRequestDTO("cozinha", 20.0, 20.0));
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        int id = 1;
+
+        when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
+
+        ComodoResponseDTO comodoResponseDTOS = new ComodoResponseDTO("cozinha", 400.0);
+
+        assertEquals(comodoResponseDTOS.getNome(), propriedadesService.buscarMaiorComodo(id).getNome());
+    }
+
+    @Test
+    void buscarPropriedadePorId_existente_Sucesso() {
+        List<ComodoRequestDTO> comodos = Arrays.asList(new ComodoRequestDTO("quarto", 10.0, 10.0),
+                new ComodoRequestDTO("sala", 10.0, 10.0),
+                new ComodoRequestDTO("cozinha", 20.0, 20.0));
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        int id = 1;
+
+        when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
+
+        assertEquals(propriedadeDTO, propriedadesService.buscarPropriedadePorId(id));
+    }
+
+    @Test
+    void buscarPropriedadePorId_naoExistente_Falha() { //TODO criar exception handler para propriedade nao existente
+        assertThrows(PropriedadeInexistenteException.class, () -> propriedadesService.buscarPropriedadePorId(10005));
     }
  }

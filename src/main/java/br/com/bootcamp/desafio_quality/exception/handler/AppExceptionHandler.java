@@ -4,6 +4,7 @@ import br.com.bootcamp.desafio_quality.dto.MensagemDeErroDTO;
 import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
 import br.com.bootcamp.desafio_quality.exception.ConflictException;
 import br.com.bootcamp.desafio_quality.exception.PersistenceException;
+import br.com.bootcamp.desafio_quality.exception.PropriedadeInexistenteException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,11 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class AppExceptionHandler {
 
-    @ExceptionHandler({BairroInexistenteException.class})
+    @ExceptionHandler({BairroInexistenteException.class, PropriedadeInexistenteException.class})
     public ResponseEntity<?> defaultHandler(){
         return ResponseEntity.badRequest().build();
     }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<MensagemDeErroDTO> methodArgumentNotValidHandler(MethodArgumentNotValidException e){

@@ -5,6 +5,7 @@ import br.com.bootcamp.desafio_quality.entity.Bairro;
 import br.com.bootcamp.desafio_quality.entity.Comodo;
 import br.com.bootcamp.desafio_quality.entity.Propriedade;
 import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
+import br.com.bootcamp.desafio_quality.exception.PropriedadeInexistenteException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
 import br.com.bootcamp.desafio_quality.repository.IPropriedadeRepository;
 import br.com.bootcamp.desafio_quality.service.IPropriedadesService;
@@ -93,7 +94,7 @@ public class PropriedadesService implements IPropriedadesService {
     private Propriedade buscarPropriedade(int id) {
         return this.propriedadeRepository
                 .buscarPropriedade(id)
-                .orElseThrow(() -> new RuntimeException("Propriedade inexistente!"));
+                .orElseThrow(() -> new PropriedadeInexistenteException("Propriedade inexistente!"));
     }
 
     private Bairro buscarBairro(String nome) {

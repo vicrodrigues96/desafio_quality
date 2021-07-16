@@ -1,6 +1,6 @@
 package br.com.bootcamp.desafio_quality.exception;
 
-public class BairroInexistenteException extends RuntimeException{
+public class BairroInexistenteException extends InexistenteException{
 
     private static final long serialVersionUID = 1L;
 
