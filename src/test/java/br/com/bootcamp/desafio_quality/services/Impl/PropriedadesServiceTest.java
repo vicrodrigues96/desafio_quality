@@ -58,33 +58,29 @@ public class PropriedadesServiceTest {
     @Test
     void inserirPropriedade_NovaPropriedade_Sucesso() {
 
-        List<ComodoRequestDTO> comodos = Arrays.asList(
-                new ComodoRequestDTO("quarto", 10.0, 10.0),
-                new ComodoRequestDTO("sala", 10.0, 5.0));
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        //given
+        PropriedadeDTO propriedadeDTO = generateDefaultPropDTO();
 
+        //when
         when(propriedadeRepository.persistePropriedade(propriedadeDTO.toEntity())).thenReturn(propriedadeDTO.toEntity());
+        Integer id = propriedadesService.inserirPropriedade(propriedadeDTO); //TODO bater esse id direitinho pra confirmar que gerou certinho
 
-        propriedadesService.inserirPropriedade(propriedadeDTO);
     }
 
     @Test
     void inserirPropriedade_JaExistente_Falha() {
-        List<ComodoRequestDTO> comodos = Arrays.asList(
-                new ComodoRequestDTO("quarto", 10.0, 10.0),
-                new ComodoRequestDTO("sala", 10.0, 5.0));
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
 
+        //given
+        PropriedadeDTO propriedadeDTO = generateDefaultPropDTO();
+
+        //when & assert
         when(propriedadeRepository.persistePropriedade(propriedadeDTO.toEntity())).thenThrow(new ConflictException("Propriedade já existe!"));
         assertThrows(ConflictException.class, () -> propriedadesService.inserirPropriedade(propriedadeDTO));
     }
 
     @Test
     void calcularAreaPropriedadeIgualA150m2() {
-        List<ComodoRequestDTO> comodos = Arrays.asList(
-                new ComodoRequestDTO("quarto", 10.0, 10.0),
-                new ComodoRequestDTO("sala", 10.0, 5.0));
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        PropriedadeDTO propriedadeDTO = generateDefaultPropDTO();
         int id = 1;
 
         when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
@@ -129,9 +125,9 @@ public class PropriedadesServiceTest {
     }
 
     @Test
-    void calcularValorTotal_bairroBGV_valor10_resultado1000() {
+    void calcularValorTotal_bairroBGV_valor10_resultado1500() {
         List<ComodoRequestDTO> comodos = Arrays.asList(
-                new ComodoRequestDTO("quarto", 10.0, 5.0),
+                new ComodoRequestDTO("quarto", 10.0, 10.0),
                 new ComodoRequestDTO("sala", 10.0, 5.0));
 
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "BGV", comodos);
@@ -141,15 +137,13 @@ public class PropriedadesServiceTest {
         Bairro bairro = new Bairro("BGV", BigDecimal.valueOf(10));
         when(bairroRepository.buscarBairro("BGV")).thenReturn(Optional.of(bairro));
 
-        assertEquals(BigDecimal.valueOf(500.0), propriedadesService.calcularValor(id).getValorTotal());
+        assertEquals(BigDecimal.valueOf(1500.0), propriedadesService.calcularValor(id).getValorTotal());
     }
 
     @Test
     void calcularAreaComodos_resultado150() {
 
-        List<ComodoRequestDTO> comodos = Arrays.asList(new ComodoRequestDTO("quarto", 10.0, 10.0),
-                                                       new ComodoRequestDTO("sala", 10.0, 5.0));
-        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+        PropriedadeDTO propriedadeDTO = generateDefaultPropDTO();
         int id = 1;
 
         when(propriedadeRepository.buscarPropriedade(id)).thenReturn(Optional.of(propriedadeDTO.toEntity()));
@@ -232,5 +226,13 @@ public class PropriedadesServiceTest {
     @Test
     void buscarPropriedadePorId_naoExistente_Falha() { //TODO criar exception handler para propriedade nao existente
         assertThrows(PropriedadeInexistenteException.class, () -> propriedadesService.buscarPropriedadePorId(10005));
+    }
+
+    private PropriedadeDTO generateDefaultPropDTO() {
+        List<ComodoRequestDTO> comodos = Arrays.asList(
+                new ComodoRequestDTO("quarto", 10.0, 10.0),
+                new ComodoRequestDTO("sala", 10.0, 5.0));
+        return new PropriedadeDTO("Propriedade do MELI1", "Centro", comodos);
+
     }
  }
