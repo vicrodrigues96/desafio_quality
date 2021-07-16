@@ -16,7 +16,7 @@ import java.util.*;
 @Repository
 public class PropriedadeRepositoryImpl implements IPropriedadeRepository {
 
-    private static final File FILE = new File("src/main/resources/repository/bairros.json");
+    private static final File FILE = new File("src/main/resources/repository/propriedades.json");
     private final ObjectMapper mapper;
     
     private final static Random random = new Random();

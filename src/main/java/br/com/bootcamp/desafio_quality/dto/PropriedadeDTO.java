@@ -27,16 +27,16 @@ public class PropriedadeDTO {
 
     @NotNull(message = "O bairro não pode ser nulo")
     @Valid
-    private BairroDTO bairro;
+    private String bairro;
 
     @NotNull(message = "A lista de comodos não pode ser nula")
     @Valid
     private List<ComodoRequestDTO> comodos;
 
     public Propriedade toEntity() {
-        List<Comodo> comodoEntities =  comodos.stream() //TODO avaliar extração para método
+        List<Comodo> comodoEntities =  comodos.stream()
                 .map(ComodoRequestDTO::toEntity)
                 .collect(Collectors.toList());
-        return new Propriedade(nome, bairro.toEntity(), comodoEntities);
+        return new Propriedade(this.nome, this.bairro, comodoEntities);
     }
 }

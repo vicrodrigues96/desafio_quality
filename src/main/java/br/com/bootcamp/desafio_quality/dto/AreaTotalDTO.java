@@ -9,5 +9,5 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NotNull
 public class AreaTotalDTO {
-    private String areaTotal;
+    private double areaTotal;
 }
