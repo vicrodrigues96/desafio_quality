@@ -1,1 +1,1 @@
-{"1":{"id":1,"nome":"Prop1","bairro":"Bairro1","comodos":null}}
+{"100":{"id":100,"nome":"Propriedade de Teste","bairro":"Centro","comodos":[{"nome":"Cozinha","comprimento":5.0,"largura":5.0,"area":25.0},{"nome":"Sala","comprimento":6.0,"largura":5.0,"area":30.0},{"nome":"Quarto","comprimento":4.0,"largura":3.0,"area":12.0}]}}
