@@ -32,7 +32,7 @@ public class BairroRepository implements IBairroRepository {
 
     @Override
     public Optional<Bairro> buscarBairro(String nome) {
-        return getList().stream().filter(b -> Objects.equals(b.getNome(), nome)).findFirst();
+        return getList().stream().filter(b -> b.getNome().equalsIgnoreCase(nome)).findFirst();
     }
 
     @Override

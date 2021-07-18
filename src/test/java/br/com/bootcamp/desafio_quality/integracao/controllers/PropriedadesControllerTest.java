@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,7 +54,6 @@ public class PropriedadesControllerTest {
 
     @Test
     public void devePersistirUmaPropriedade() throws Exception {
-
         String payload = mapper.writeValueAsString(retornaUmJsonPropriedade());
 
         mock.perform(post("/propriedades/")
@@ -74,7 +72,9 @@ public class PropriedadesControllerTest {
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
                 .content(payload))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.statusCode", is(409)))
+                .andExpect(jsonPath("$.message", is("Propriedade já existe!")));
     }
 
     @Test
@@ -89,6 +89,15 @@ public class PropriedadesControllerTest {
     }
 
     @Test
+    public void naoDeveListarUmaPropriedadeInexistente() throws Exception {
+
+        mock.perform(get("/propriedades/{id}", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Propriedade inexistente!")));
+    }
+
+    @Test
     public void deveCalcularAreaTotal() throws Exception {
         salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
 
@@ -99,8 +108,16 @@ public class PropriedadesControllerTest {
     }
 
     @Test
-    public void deveCalcularValorTotal() throws Exception {
+    public void naoDeveCalcularAreaDePropriedadeInexistente() throws Exception {
 
+        mock.perform(get("/propriedades/{id}/area", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Propriedade inexistente!")));
+    }
+
+    @Test
+    public void deveCalcularValorTotal() throws Exception {
         salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}/valor", "100"))
@@ -110,14 +127,24 @@ public class PropriedadesControllerTest {
     }
 
     @Test
-    public void naoDeveCalcularValorTotalQuandoNaoExistirBairro() throws Exception {
+    public void naoDeveCalcularValorDePropriedadeInexistente() throws Exception {
 
+        mock.perform(get("/propriedades/{id}/area", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Propriedade inexistente!")));
+    }
+
+    @Test
+    public void naoDeveCalcularValorTotalQuandoNaoExistirBairro() throws Exception {
         salvaPropriedadeTabela(
                 100, new Propriedade("Propriedade sem bairro", "bairroInexistente", null)
         );
 
         mock.perform(get("/propriedades/{id}/valor", "100"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Bairro não existe!")));
     }
 
     @Test
@@ -129,6 +156,15 @@ public class PropriedadesControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.nome", is("Sala")))
                 .andExpect(jsonPath("$.area", is(30.0)));
+    }
+
+    @Test
+    public void naoDeveRetornarMaiorComodoDePropriedadeInexistente() throws Exception {
+
+        mock.perform(get("/propriedades/{id}/area", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Propriedade inexistente!")));
     }
 
     @Test
@@ -145,8 +181,67 @@ public class PropriedadesControllerTest {
                 .andExpect(jsonPath("$.[2].area", is(12.0)));
     }
 
-    public PropriedadeDTO retornaUmJsonPropriedade() {
+    @Test
+    public void naoDeveRetornarListaDeComodosDePropriedadeInexistente() throws Exception {
 
+        mock.perform(get("/propriedades/{id}/area", "100"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Propriedade inexistente!")));
+    }
+
+    @Test
+    public void naoDevePersistirPropriedadeComNomeIniciandoComLetraMinuscula() throws Exception {
+        List<ComodoRequestDTO> comodosDto = retornaListaDomodosDtos();
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("nomeLetraMinuscula", "Centro", comodosDto);
+        String payload = mapper.writeValueAsString(propriedadeDTO);
+
+        mock.perform(post("/propriedades/")
+                .contentType("application/json")
+                .content(payload))
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("nome:  O nome da propriedade deve ser começar com uma letra maiuscula")));
+    }
+
+    @Test
+    public void naoDeveCadastrarUmaPropriedadeSemComodos() throws Exception {
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Imovel para Testes", "Centro", null);
+        String payload = mapper.writeValueAsString(propriedadeDTO);
+
+        mock.perform(post("/propriedades/")
+                .contentType("application/json")
+                .content(payload))
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("comodos: A lista de comodos não pode ser nula")));
+    }
+
+    @Test
+    public void naoDevePersistirUmaPropriedadeQuandoNaoExistirOBairro() throws Exception {
+        List<ComodoRequestDTO> comodosDto = retornaListaDomodosDtos();
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Bairro Inexistente", "Bairro Inexistente Teste", comodosDto);
+        String payload = mapper.writeValueAsString(propriedadeDTO);
+
+        mock.perform(post("/propriedades/")
+                .contentType("application/json")
+                .content(payload))
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", is("Não foi possível cadastrar a propriedade, bairro não existe.")));
+    }
+
+    @Test
+    public void naoDevePersistirUmaPropriedadeComComodosComLetraMinuscula() throws Exception {
+        List<ComodoRequestDTO> comodosDto = Arrays.asList(new ComodoRequestDTO("cozinha", 10.0, 10.0));
+        PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Bairro Inexistente", "Centro", comodosDto);
+        String payload = mapper.writeValueAsString(propriedadeDTO);
+
+        mock.perform(post("/propriedades/")
+                .contentType("application/json")
+                .content(payload))
+                .andExpect(jsonPath("$.statusCode", is(400)))
+                .andExpect(jsonPath("$.message", containsString("O nome do comodo deve ser começar com uma letra maiuscula")));
+    }
+
+    public PropriedadeDTO retornaUmJsonPropriedade() {
         List<ComodoRequestDTO> comodosDto = retornaListaDomodosDtos();
 
         return new PropriedadeDTO("Propriedade de Teste", "Centro", comodosDto);

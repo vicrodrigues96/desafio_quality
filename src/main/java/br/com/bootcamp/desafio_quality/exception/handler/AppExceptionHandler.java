@@ -21,18 +21,18 @@ import java.util.stream.Collectors;
 public class AppExceptionHandler {
 
     @ExceptionHandler({BairroInexistenteException.class, PropriedadeInexistenteException.class})
-    public ResponseEntity<?> defaultHandler(){
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> defaultHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(new MensagemDeErroDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<MensagemDeErroDTO> methodArgumentNotValidHandler(MethodArgumentNotValidException e){
+    public ResponseEntity<MensagemDeErroDTO> methodArgumentNotValidHandler(MethodArgumentNotValidException e) {
 
         List<String> fieldErrorsString = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(f -> f.getField()+": "+f.getDefaultMessage())
+                .map(f -> f.getField() + ": " + f.getDefaultMessage())
                 .collect(Collectors.toList());
 
         String stringErrors = String.join(", ", fieldErrorsString);

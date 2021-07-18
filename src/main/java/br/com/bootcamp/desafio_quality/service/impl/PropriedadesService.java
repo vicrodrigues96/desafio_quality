@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +35,6 @@ public class PropriedadesService implements IPropriedadesService {
     public Integer inserirPropriedade(PropriedadeDTO propriedadeDto) {
         Propriedade propriedade = propriedadeDto.toEntity();
         existeBairro(propriedade.getBairro());
-
         return this.propriedadeRepository.persistePropriedade(propriedade).getId();
     }
 
@@ -80,7 +80,8 @@ public class PropriedadesService implements IPropriedadesService {
     }
 
     private void existeBairro(String nome) {
-        if (Objects.isNull(bairroRepository.buscarBairro(nome))) {
+
+        if (bairroRepository.buscarBairro(nome).isEmpty()) {
             throw new BairroInexistenteException("Não foi possível cadastrar a propriedade, bairro não existe.");
         }
     }
