@@ -1,6 +1,7 @@
 package br.com.bootcamp.desafio_quality.integracao.repositories;
 
 import br.com.bootcamp.desafio_quality.entity.Bairro;
+import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
 import br.com.bootcamp.desafio_quality.exception.ConflictException;
 import br.com.bootcamp.desafio_quality.exception.PersistenceException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
@@ -142,10 +143,10 @@ public class BairrosRepositoryTest {
     void alteraBairro_bancoVazio_deveRetornarExcessao(){
         var bairroCriado1 = new Bairro("Bairro1", new BigDecimal(15));
 
-        PersistenceException persistenceException = assertThrows(PersistenceException.class,
+        BairroInexistenteException bairroInexistenteException = assertThrows(BairroInexistenteException.class,
                 () -> bairroRepository.alterarBairro(bairroCriado1));
 
-        assertEquals("Bairro não existe!", persistenceException.getMessage());
+        assertEquals("Bairro não existe!", bairroInexistenteException.getMessage());
     }
 
     @Test
@@ -155,10 +156,10 @@ public class BairrosRepositoryTest {
 
         salvaBairro(bairroCriado1);
 
-        PersistenceException persistenceException = assertThrows(PersistenceException.class,
+        BairroInexistenteException bairroInexistenteException = assertThrows(BairroInexistenteException.class,
                 () -> bairroRepository.alterarBairro(bairroCriado2));
 
-        assertEquals("Bairro não existe!", persistenceException.getMessage());
+        assertEquals("Bairro não existe!", bairroInexistenteException.getMessage());
     }
 
     @Test
