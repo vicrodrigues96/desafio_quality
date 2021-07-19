@@ -1,6 +1,7 @@
 package br.com.bootcamp.desafio_quality.repository.impl;
 
 import br.com.bootcamp.desafio_quality.entity.Bairro;
+import br.com.bootcamp.desafio_quality.exception.BairroInexistenteException;
 import br.com.bootcamp.desafio_quality.exception.ConflictException;
 import br.com.bootcamp.desafio_quality.exception.PersistenceException;
 import br.com.bootcamp.desafio_quality.repository.IBairroRepository;
@@ -51,7 +52,10 @@ public class BairroRepository implements IBairroRepository {
     @Override
     public void deletarBairro(String nome) {
         List<Bairro> bairros = this.getList();
-        bairros.removeIf(b -> b.getNome().equalsIgnoreCase(nome));
+        boolean foiRemovido = bairros.removeIf(b -> b.getNome().equalsIgnoreCase(nome));
+        if (!foiRemovido) {
+            throw new BairroInexistenteException("Bairro a ser deletado não encontrado");
+        }
 
         persistirJson(bairros);
     }
@@ -62,7 +66,7 @@ public class BairroRepository implements IBairroRepository {
         int indice = bairros.indexOf(bairro);
 
         if (indice < 0) {
-            throw new PersistenceException("Bairro não existe!");
+            throw new BairroInexistenteException("Bairro não existe!");
         }
 
         bairros.set(indice, bairro);

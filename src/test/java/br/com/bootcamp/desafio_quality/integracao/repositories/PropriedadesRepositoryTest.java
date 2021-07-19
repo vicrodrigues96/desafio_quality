@@ -6,6 +6,7 @@ import br.com.bootcamp.desafio_quality.exception.PersistenceException;
 import br.com.bootcamp.desafio_quality.repository.IPropriedadeRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +30,16 @@ public class PropriedadesRepositoryTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private Environment env;
+    private final File file;
 
-    private File file;
+    @Autowired
+    public PropriedadesRepositoryTest(Environment env) {
+        var filePath = env.getProperty("repository.propriedades.path", "src/test/resources/repository/propriedades.json");
+        file = new File(filePath);
+    }
 
     @BeforeEach
     void setUp() throws IOException {
-        var filePath = env.getProperty("repository.propriedades.path", "src/test/resources/repository/propriedades.json");
-        file = new File(filePath);
         objectMapper.writeValue(file, new HashMap<>());
     }
 

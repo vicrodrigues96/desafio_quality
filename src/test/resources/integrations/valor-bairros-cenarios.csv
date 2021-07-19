@@ -1,0 +1,4 @@
+valor, statuscode, mensagem
+ , 400, custoPorMetroQuadrado: O valor do metro quadrado do bairro não pode ser vazio
+99999999999999.0, 400, custoPorMetroQuadrado: O comprimento máximo não pode excedor 13 digitos
+-20.0, 400, custoPorMetroQuadrado: must be greater than 0

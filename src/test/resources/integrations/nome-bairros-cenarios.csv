@@ -1,0 +1,3 @@
+nome, statuscode, mensagem
+dezDigitosdezDigitosdezDigitosdezDigitosdezDigitosdezDigitos, 400, nome: O comprimento do nome não pode exceder 45 caracteres
+, 400, nome: O nome do bairro não pode ser vazio
