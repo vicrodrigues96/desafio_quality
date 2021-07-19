@@ -1,10 +1,8 @@
 package br.com.bootcamp.desafio_quality.integracao.controllers;
 
 import br.com.bootcamp.desafio_quality.entity.Bairro;
-import br.com.bootcamp.desafio_quality.exception.PersistenceException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import br.com.bootcamp.desafio_quality.integracao.IntegrationTestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -16,11 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.core.Is.is;
@@ -33,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class BairrosControllerTest {
+public class BairrosControllerTest extends IntegrationTestBase {
 
     public static final String BASE_PATH = "/bairros";
     public static final String PATH_NAME = BASE_PATH + "/{name}";
@@ -44,17 +38,9 @@ public class BairrosControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final File file;
-
     @Autowired
     public BairrosControllerTest(Environment env) {
-        var filePath = env.getProperty("repository.bairros.path", "src/test/resources/repository/bairros.json");
-        file = new File(filePath);
-    }
-
-    @BeforeEach
-    void setUp() throws IOException {
-        objectMapper.writeValue(file, new ArrayList<>());
+      super(env);
     }
 
     @Test
@@ -166,45 +152,6 @@ public class BairrosControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.statusCode", is(400)))
                 .andExpect(jsonPath("$.message", is("Bairro não existe!")));
-    }
-
-    private Bairro getBairro(String nomeBairro) {
-        return getBairros()
-                .stream()
-                .filter(b -> Objects.equals(b.getNome(), nomeBairro))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private void persisteBairro(Bairro bairro) {
-        List<Bairro> bairros = this.getBairros();
-        bairros.add(bairro);
-        persistirJson(bairros);
-    }
-
-    private List<Bairro> getBairros() {
-        List<Bairro> bairros;
-        try {
-            bairros = objectMapper.readValue(file, new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new PersistenceException("Não foi possível obter os bairros.");
-        }
-        return bairros;
-    }
-
-    private void persistirJson(List<Bairro> bairros) {
-        try {
-            objectMapper.writeValue(file, bairros);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new PersistenceException("Não foi possível salvar o bairro.");
-        }
-    }
-
-    private boolean existeBairro(String nome) {
-        return getBairros().stream().anyMatch(b -> Objects.equals(b.getNome(), nome));
     }
 
 }

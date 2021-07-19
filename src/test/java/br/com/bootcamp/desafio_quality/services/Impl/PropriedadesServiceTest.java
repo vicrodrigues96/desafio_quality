@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
@@ -63,6 +64,8 @@ public class PropriedadesServiceTest {
 
         //when
         when(propriedadeRepository.persistePropriedade(propriedadeDTO.toEntity())).thenReturn(propriedadeDTO.toEntity());
+        when(bairroRepository.buscarBairro(propriedadeDTO.getBairro())).thenReturn(Optional.of(new Bairro(propriedadeDTO.getBairro(), new BigDecimal("10.0"))));
+
         Integer id = propriedadesService.inserirPropriedade(propriedadeDTO); //TODO bater esse id direitinho pra confirmar que gerou certinho
 
     }
@@ -75,6 +78,8 @@ public class PropriedadesServiceTest {
 
         //when & assert
         when(propriedadeRepository.persistePropriedade(propriedadeDTO.toEntity())).thenThrow(new ConflictException("Propriedade já existe!"));
+        when(bairroRepository.buscarBairro(propriedadeDTO.getBairro())).thenReturn(Optional.of(new Bairro(propriedadeDTO.getBairro(), new BigDecimal("10.0"))));
+
         assertThrows(ConflictException.class, () -> propriedadesService.inserirPropriedade(propriedadeDTO));
     }
 

@@ -2,11 +2,10 @@ package br.com.bootcamp.desafio_quality.integracao.controllers;
 
 import br.com.bootcamp.desafio_quality.dto.ComodoRequestDTO;
 import br.com.bootcamp.desafio_quality.dto.PropriedadeDTO;
+import br.com.bootcamp.desafio_quality.entity.Bairro;
 import br.com.bootcamp.desafio_quality.entity.Propriedade;
-import br.com.bootcamp.desafio_quality.exception.PersistenceException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import br.com.bootcamp.desafio_quality.integracao.IntegrationTestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,10 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.File;
-import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -29,32 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class PropriedadesControllerTest {
+public class PropriedadesControllerTest extends IntegrationTestBase {
 
     @Autowired
     private MockMvc mock;
 
     @Autowired
-    private ObjectMapper mapper;
-
-    private String filePath;
-    private File file;
-
-    @Autowired
     public PropriedadesControllerTest(Environment env) {
-        this.filePath = env.getProperty("repository.propriedades.path",
-                "src/test/resources/repository/propriedades.json");
-        this.file = new File(filePath);
-    }
-
-    @BeforeEach
-    void setUp() throws IOException {
-        mapper.writeValue(this.file, new HashMap<>());
+        super(env);
     }
 
     @Test
     public void devePersistirUmaPropriedade() throws Exception {
-        String payload = mapper.writeValueAsString(retornaUmJsonPropriedade());
+        persisteBairro(new Bairro("Centro", new BigDecimal("19.0")));
+        String payload = objectMapper.writeValueAsString(retornaUmJsonPropriedade());
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -65,9 +50,10 @@ public class PropriedadesControllerTest {
 
     @Test
     public void NaoDevePersistirUmaPropriedadeExistente() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persisteBairro(new Bairro("Centro", new BigDecimal("19.0")));
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
-        String payload = mapper.writeValueAsString(retornaUmJsonPropriedade());
+        String payload = objectMapper.writeValueAsString(retornaUmJsonPropriedade());
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -79,7 +65,7 @@ public class PropriedadesControllerTest {
 
     @Test
     public void deveListarUmaPropriedadeCriada() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}", "100"))
                 .andExpect(status().isOk())
@@ -99,7 +85,7 @@ public class PropriedadesControllerTest {
 
     @Test
     public void deveCalcularAreaTotal() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}/area", "100"))
                 .andExpect(status().isOk())
@@ -118,7 +104,8 @@ public class PropriedadesControllerTest {
 
     @Test
     public void deveCalcularValorTotal() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persisteBairro(new Bairro("Centro", new BigDecimal("30.0")));
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}/valor", "100"))
                 .andExpect(status().isOk())
@@ -137,7 +124,7 @@ public class PropriedadesControllerTest {
 
     @Test
     public void naoDeveCalcularValorTotalQuandoNaoExistirBairro() throws Exception {
-        salvaPropriedadeTabela(
+        persistePropriedade(
                 100, new Propriedade("Propriedade sem bairro", "bairroInexistente", null)
         );
 
@@ -149,7 +136,7 @@ public class PropriedadesControllerTest {
 
     @Test
     public void deveRetornarOMaiorComodo() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}/comodos/maior", "100"))
                 .andExpect(status().isOk())
@@ -169,7 +156,7 @@ public class PropriedadesControllerTest {
 
     @Test
     public void deveRetornarUmaListaDeComodosComArea() throws Exception {
-        salvaPropriedadeTabela(100, retornaUmJsonPropriedade().toEntity());
+        persistePropriedade(100, retornaUmJsonPropriedade().toEntity());
 
         mock.perform(get("/propriedades/{id}/comodos/area", "100"))
                 .andExpect(status().isOk())
@@ -194,7 +181,7 @@ public class PropriedadesControllerTest {
     public void naoDevePersistirPropriedadeComNomeIniciandoComLetraMinuscula() throws Exception {
         List<ComodoRequestDTO> comodosDto = retornaListaDomodosDtos();
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO("nomeLetraMinuscula", "Centro", comodosDto);
-        String payload = mapper.writeValueAsString(propriedadeDTO);
+        String payload = objectMapper.writeValueAsString(propriedadeDTO);
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -206,7 +193,7 @@ public class PropriedadesControllerTest {
     @Test
     public void naoDeveCadastrarUmaPropriedadeSemComodos() throws Exception {
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Imovel para Testes", "Centro", null);
-        String payload = mapper.writeValueAsString(propriedadeDTO);
+        String payload = objectMapper.writeValueAsString(propriedadeDTO);
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -219,7 +206,7 @@ public class PropriedadesControllerTest {
     public void naoDevePersistirUmaPropriedadeQuandoNaoExistirOBairro() throws Exception {
         List<ComodoRequestDTO> comodosDto = retornaListaDomodosDtos();
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Bairro Inexistente", "Bairro Inexistente Teste", comodosDto);
-        String payload = mapper.writeValueAsString(propriedadeDTO);
+        String payload = objectMapper.writeValueAsString(propriedadeDTO);
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -232,7 +219,7 @@ public class PropriedadesControllerTest {
     public void naoDevePersistirUmaPropriedadeComComodosComLetraMinuscula() throws Exception {
         List<ComodoRequestDTO> comodosDto = Arrays.asList(new ComodoRequestDTO("cozinha", 10.0, 10.0));
         PropriedadeDTO propriedadeDTO = new PropriedadeDTO("Bairro Inexistente", "Centro", comodosDto);
-        String payload = mapper.writeValueAsString(propriedadeDTO);
+        String payload = objectMapper.writeValueAsString(propriedadeDTO);
 
         mock.perform(post("/propriedades/")
                 .contentType("application/json")
@@ -254,35 +241,5 @@ public class PropriedadesControllerTest {
                 new ComodoRequestDTO("Sala", 6.0, 5.0),
                 new ComodoRequestDTO("Quarto", 4.0, 3.0)
         );
-    }
-
-    private void salvaPropriedadeTabela(Integer id, Propriedade propriedade) {
-        HashMap<Integer, Propriedade> propriedades = this.getPropriedades();
-
-        propriedade.setId(id);
-        propriedades.put(id, propriedade);
-
-        persistirJson(propriedades);
-    }
-
-    private void persistirJson(HashMap<Integer, Propriedade> propriedades) {
-        try {
-            mapper.writeValue(this.file, propriedades);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new PersistenceException("Não foi possível salvar o propriedade.");
-        }
-    }
-
-    private HashMap<Integer, Propriedade> getPropriedades() {
-        HashMap<Integer, Propriedade> propriedades;
-        try {
-            propriedades = mapper.readValue(this.file, new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new PersistenceException("Não foi possível obter os propriedades.");
-        }
-        return propriedades;
     }
 }

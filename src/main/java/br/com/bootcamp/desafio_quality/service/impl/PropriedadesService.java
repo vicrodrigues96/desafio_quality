@@ -80,7 +80,6 @@ public class PropriedadesService implements IPropriedadesService {
     }
 
     private void existeBairro(String nome) {
-
         if (bairroRepository.buscarBairro(nome).isEmpty()) {
             throw new BairroInexistenteException("Não foi possível cadastrar a propriedade, bairro não existe.");
         }
